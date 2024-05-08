@@ -6,7 +6,7 @@ from auth import drive_service
 
 def read_range():
 
-    range_name = 'add harga!A1:H'  # read an empty row for new data
+    range_name = 'harga barang!A1:H'  # read an empty row for new data
     spreadsheet_id = '10YgWzGWXBtVvlLRnPyZAZ-xmt0cNZZwRu_23wgqyccw'
 
     result = spreadsheet_service.spreadsheets().values().get(
@@ -25,7 +25,7 @@ def write_range():
 
     spreadsheet_id = '10YgWzGWXBtVvlLRnPyZAZ-xmt0cNZZwRu_23wgqyccw'  # get the ID of the existing sheet
 
-    range_name = 'add harga!A2:H'  # update the range for three rows
+    range_name = 'harga barang!A2:H'  # update the range for three rows
 
     values = [
 

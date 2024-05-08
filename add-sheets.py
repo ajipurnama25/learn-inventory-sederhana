@@ -17,7 +17,7 @@ def inpuser():
     for i in range(n):  
         id_barang = input(f"Masukkan ID untuk baris ke-{i+1}: ")
         nama_barang = input(f"Masukkan Nama Barang untuk baris ke-{i+1}: ")
-        harga_barang = input(f"Masukkan Harga Barang untuk baris ke-{i+1}: ")
+        harga_barang = input(f"Masukkan jumlah Barang untuk baris ke-{i+1}: ")
         new_data.append([id_barang, nama_barang, harga_barang])
     return new_data
 

@@ -1,4 +1,6 @@
 from __future__ import print_function
+import tkinter as tk
+from tkinter import simpledialog, messagebox
 from auth import spreadsheet_service
 
 def read_stock():
@@ -10,7 +12,7 @@ def read_stock():
     return rows
 
 def read_price():
-    range_name = 'item price!A2:D'  # Read data from the "harga barang" sheet
+    range_name = 'item price!A2:H'  # Read data from the "harga barang" sheet
     spreadsheet_id = '10YgWzGWXBtVvlLRnPyZAZ-xmt0cNZZwRu_23wgqyccw'
     result = spreadsheet_service.spreadsheets().values().get(
         spreadsheetId=spreadsheet_id, range=range_name).execute()
@@ -18,7 +20,7 @@ def read_price():
     return rows
 
 def update_stock(new_stock):
-    range_name = 'master item!A2:C'  # Update data in the "stock barang" sheet
+    range_name = 'master item!A2:H'  # Update data in the "stock barang" sheet
     spreadsheet_id = '10YgWzGWXBtVvlLRnPyZAZ-xmt0cNZZwRu_23wgqyccw'
     value_input_option = 'USER_ENTERED'
     body = {'values': new_stock}
@@ -28,16 +30,19 @@ def update_stock(new_stock):
     return result
 
 def inpuser():
-    inp = input("Masukkan nama pembeli: ")
+    root = tk.Tk()
+    root.withdraw()  # Hide the root window
+    nama_user = simpledialog.askstring("Input", "Masukkan nama anda:")
+    inp = simpledialog.askinteger("Input", "Masukkan jumlah data yang ingin dibeli:")
     data = []
     for x in range(inp):
-        nama_barang = input(f"Masukkan nama barang yang ingin dibeli {x+1}: ")
-        jumlah_beli = int(input(f"Masukkan jumlah barang yang ingin dibeli untuk {nama_barang}: "))
+        nama_barang = simpledialog.askstring("Input", f"Masukkan nama barang yang ingin dibeli {x+1}:")
+        jumlah_beli = simpledialog.askinteger("Input", f"Masukkan jumlah barang yang ingin dibeli untuk {nama_barang}:")
         data.append([nama_barang, jumlah_beli])
-    return data
+    return nama_user, data
 
 def process_transaction():
-    input_data = inpuser()
+    nama_user, input_data = inpuser()
     stock_data = read_stock()
     price_data = read_price()
     harga_total = 0
@@ -52,7 +57,7 @@ def process_transaction():
                 if jumlah_beli <= current_stock:
                     stock_data[i][2] = str(current_stock - jumlah_beli)  # Update stock
                     update_stock(stock_data)
-                    print("Transaksi berhasil! Stok barang telah diperbarui.")
+                    messagebox.showinfo("Success", "Transaksi berhasil! Stok barang telah diperbarui.")
                     
                     # Find the price of the item
                     for price_row in price_data:
@@ -62,23 +67,23 @@ def process_transaction():
                             harga_total += total_harga
                             
                             # Add transaction data to the list
-                            transaction_data.append([nama_barang, jumlah_beli, harga_barang, total_harga])
+                            transaction_data.append([nama_user, nama_barang, jumlah_beli, harga_barang, total_harga])
                             break
                     else:
-                        print(f"Harga barang untuk {nama_barang} tidak ditemukan.")
+                        messagebox.showerror("Error", f"Harga barang untuk {nama_barang} tidak ditemukan.")
                     
                     break
                 else:
-                    print(f"Maaf, stok barang {nama_barang} tidak mencukupi untuk jumlah yang diminta.")
+                    messagebox.showerror("Error", f"Maaf, stok barang {nama_barang} tidak mencukupi untuk jumlah yang diminta.")
                     break
         
         if not found:
-            print(f"Barang {nama_barang} tidak ditemukan dalam stok.")
+            messagebox.showerror("Error", f"Barang {nama_barang} tidak ditemukan dalam stok.")
     
     return transaction_data, harga_total
 
 def save_transaction(transaction_data):
-    range_name = 'transaction!A2:D'  # Update transaction data in the "transaction" sheet
+    range_name = 'transaction!A2:E'  # Update transaction data in the "transaction" sheet
     spreadsheet_id = '10YgWzGWXBtVvlLRnPyZAZ-xmt0cNZZwRu_23wgqyccw'
     value_input_option = 'USER_ENTERED'
     body = {'values': transaction_data}
@@ -88,8 +93,10 @@ def save_transaction(transaction_data):
     return result
 
 if __name__ == '__main__':
+    root = tk.Tk()
+    root.withdraw()  # Hide the root window
     transaction_data, total_harga = process_transaction()
-    print(f"Total pembayaran yang anda lakukan: Rp.{total_harga}")
+    messagebox.showinfo("Total Pembayaran", f"Total pembayaran yang anda lakukan: Rp.{total_harga}")
     
     # Add transaction data to Google Sheets
     save_transaction(transaction_data)

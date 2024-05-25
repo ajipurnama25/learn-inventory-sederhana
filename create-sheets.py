@@ -13,7 +13,6 @@ def create():
         'title': 'latihan DS'
 
         }
-
     }
 
     sheet = spreadsheet_service.spreadsheets().create(body=spreadsheet_details,

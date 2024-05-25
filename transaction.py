@@ -17,6 +17,10 @@ def read_price():
     rows = result.get('values', [])
     return rows
 
+def login():
+    username = input("Masukan username: ")
+    return username
+
 def update_stock(new_stock):
     range_name = 'master item!A2:C'  # Update data in the "stock barang" sheet
     spreadsheet_id = '10YgWzGWXBtVvlLRnPyZAZ-xmt0cNZZwRu_23wgqyccw'
@@ -28,7 +32,7 @@ def update_stock(new_stock):
     return result
 
 def inpuser():
-    inp = input("Masukkan nama pembeli: ")
+    inp = int(input("Masukkan jumlah barang yang ingin dibeli: "))
     data = []
     for x in range(inp):
         nama_barang = input(f"Masukkan nama barang yang ingin dibeli {x+1}: ")
@@ -36,7 +40,7 @@ def inpuser():
         data.append([nama_barang, jumlah_beli])
     return data
 
-def process_transaction():
+def process_transaction(username):
     input_data = inpuser()
     stock_data = read_stock()
     price_data = read_price()
@@ -62,12 +66,11 @@ def process_transaction():
                             harga_total += total_harga
                             
                             # Add transaction data to the list
-                            transaction_data.append([nama_barang, jumlah_beli, harga_barang, total_harga])
+                            transaction_data.append([username, nama_barang, jumlah_beli, harga_barang, total_harga])
                             break
                     else:
                         print(f"Harga barang untuk {nama_barang} tidak ditemukan.")
-                    
-                    break
+                        break
                 else:
                     print(f"Maaf, stok barang {nama_barang} tidak mencukupi untuk jumlah yang diminta.")
                     break
@@ -78,7 +81,7 @@ def process_transaction():
     return transaction_data, harga_total
 
 def save_transaction(transaction_data):
-    range_name = 'transaction!A2:D'  # Update transaction data in the "transaction" sheet
+    range_name = 'transaction!A2:E'  # Update transaction data in the "transaction" sheet
     spreadsheet_id = '10YgWzGWXBtVvlLRnPyZAZ-xmt0cNZZwRu_23wgqyccw'
     value_input_option = 'USER_ENTERED'
     body = {'values': transaction_data}
@@ -88,7 +91,8 @@ def save_transaction(transaction_data):
     return result
 
 if __name__ == '__main__':
-    transaction_data, total_harga = process_transaction()
+    username = login()
+    transaction_data, total_harga = process_transaction(username)
     print(f"Total pembayaran yang anda lakukan: Rp.{total_harga}")
     
     # Add transaction data to Google Sheets
